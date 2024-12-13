@@ -8,9 +8,13 @@ options: [Option!]!
 quiz: Quiz!
 }
 
-extends type Query{
+extend type Query{
 questions: [Question!]!
 question(id:ID!): Question
+}
+
+extend type Mutation{
+createQuestion(quizId: ID!, content:String!): Question!
 }
 `;
 

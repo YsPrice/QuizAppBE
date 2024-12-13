@@ -9,10 +9,14 @@ questions:[Question!]!
 createdBy: User!
 
 }
-extends type Query{
+extend type Query{
 quizzes: [Quiz!]!
 quiz(id: ID!): Quiz
 }
+extend type Mutation {
+  createQuiz(title: String!, difficulty: String!): Quiz!
+}
+
 `;
 
 
