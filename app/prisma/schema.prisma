@@ -17,12 +17,16 @@ model User {
   id  Int  @id @default(autoincrement())
   email String @unique
   userName String @unique
+  profilePic String?
   quizzes Quiz[]
+  quizzesMade Int?
+  quizzesCompleted Int?
 }
 
 model Quiz {
   id Int @id @default(autoincrement())
   createdById Int
+  title String
  createdBy User @relation(fields: [createdById], references:[id])
   difficulty Difficulty
   createdAt DateTime @default(now())

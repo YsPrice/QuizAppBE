@@ -1,12 +1,27 @@
+const { ApolloServer } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
 const express = require('express');
+const prisma = require('./utils/prisma');
 const app = express();
 const port = 3000;
 
-app.get('/',(req,res)=>{
-    res.send('Hello world!');
-    
-});
+const typeDefs = `
+   type Query {
+    healthCheck: String
+   }`
+;
+const resolvers = {
+    Query: {
+      healthCheck: () => "Server is up and running!",
+    },
+  };
+  const server = new ApolloServer({ typeDefs, resolvers });
 
-app.listen(port,()=>{
-    console.log(`app is running at port:${port}`)
-})
+  async function startServer(){
+    await server.start();
+    app.use('/graphql',express.json(),expressMiddleware(server));
+    app.listen(4000, ()=>{
+        console.log('Server is running at port 4000/graphql')
+    })
+  };
+  startServer();
