@@ -14,7 +14,9 @@ quizzes: [Quiz!]!
 quiz(id: ID!): Quiz
 }
 extend type Mutation {
-  createQuiz(title: String!, difficulty: String!): Quiz!
+  createQuiz( title: String!, difficulty: String!): Quiz!
+  editQuiz(id: ID!, title:String,difficulty:String):Quiz!
+  deleteQuiz(id:ID!):Quiz!
 }
 
 `;

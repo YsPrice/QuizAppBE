@@ -15,7 +15,9 @@ option(id:ID!):Option
 }
 
 extend type Mutation{
-createOption(questionId: ID!, isCorrect: Boolean!,content: String!)
+createOption(questionId: ID!, isCorrect: Boolean!,content: String!): Option!
+deleteOption(questionId: ID!, optionId: ID!): Option!
+editOption(questionId: ID!, optionId: ID!, isCorrect: Boolean, content:String): Option!
 }
 `;
 

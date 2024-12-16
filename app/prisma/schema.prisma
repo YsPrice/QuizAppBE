@@ -27,7 +27,7 @@ model Quiz {
   id Int @id @default(autoincrement())
   createdById Int
   title String
- createdBy User @relation(fields: [createdById], references:[id])
+ createdBy User @relation(fields: [createdById], references:[id],onDelete: Cascade)
   difficulty Difficulty
   createdAt DateTime @default(now())
   questions Question[]
@@ -37,7 +37,7 @@ model Question {
   id Int @id @default(autoincrement())
   content String 
   quizId Int
-  quiz Quiz @relation(fields: [quizId], references:[id])
+  quiz Quiz @relation(fields: [quizId], references:[id],onDelete: Cascade)
   options Option[]
 }
 
