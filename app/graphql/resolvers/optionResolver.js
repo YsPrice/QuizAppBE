@@ -1,5 +1,5 @@
 const prisma = require('../../utils/prisma');
-const { validateId, validateOwnership } = require('../../utils/helperFunctions');
+const { validateId, validateOptionOwnership } = require('../../utils/helperFunctions');
 
 const optionResolver = {
   Query: {
@@ -8,39 +8,48 @@ const optionResolver = {
       return await prisma.option.findMany({ where: { questionId: questionIdInt } });
     },
   },
+  Option:{
+question: async (parent,_) =>{
+  return await prisma.question.findUnique({
+    where: {id: parent.questionId},
+  })
+}
+  },
   Mutation: {
     createOption: async (_, { questionId, isCorrect, content }, context) => {
       if (!context.userId) throw new Error('Not Authenticated');
 
       const questionIdInt = validateId(questionId, 'question'); 
-
-      await validateOwnership(context, questionIdInt);
-
-      
+      const question = await prisma.question.findUnique({ where: { id: questionIdInt } });
+      if (!question) throw new Error('Question not found!');
+      const quiz = await prisma.quiz.findUnique({ where: { id: question.quizId } });
+      if (!quiz) throw new Error('Quiz not found!');
+      if (quiz.createdById !== context.userId) throw new Error('Not authorized to add options to this question!');
       return await prisma.option.create({
         data: {
           content,
           isCorrect,
           questionId: questionIdInt,
         },
+        include: {
+          question: true, 
+        },
+
       });
     },
     deleteOption: async (_, { questionId, optionId }, context) => {
       if (!context.userId) throw new Error('Authentication Required');
-
-      const questionIdInt = validateId(questionId, 'question'); 
+    
+      const questionIdInt = validateId(questionId, 'question');
       const optionIdInt = validateId(optionId, 'option');
-
-     
-      await validateOwnership(context, questionIdInt);
-
-
-      const option = await prisma.option.findUnique({ where: { id: optionIdInt } });
-      if (!option) throw new Error('Option doesn’t exist!');
-
-  
-      return await prisma.option.delete({ where: { id: optionIdInt } });
+    
+      await validateOptionOwnership(context, optionIdInt);
+    
+      await prisma.option.delete({ where: { id: optionIdInt } });
+    
+      return { message: "Option deleted successfully" };
     },
+    
     editOption: async (_, { questionId, optionId, isCorrect, content }, context) => {
       if (!context.userId) throw new Error('Authentication Required');
 
@@ -48,7 +57,7 @@ const optionResolver = {
       const optionIdInt = validateId(optionId, 'option'); 
 
      
-      await validateOwnership(context, questionIdInt);
+      await validateOptionOwnership(context, optionIdInt);
 
       const option = await prisma.option.findUnique({ where: { id: optionIdInt } });
       if (!option) throw new Error("Option doesn't exist!");

@@ -13,7 +13,7 @@ const quizResolvers = {
     },
 Mutation: {
     createQuiz: async (_, {title, difficulty}, context) => {
-        if(!context.userId) throw new error('Authentication Required!');
+        if(!context.userId) throw new Error('Authentication Required!');
       
         return await prisma.quiz.create({
             data:{
@@ -48,12 +48,19 @@ Mutation: {
         const quizId= validateId(id, 'quiz'); 
         await validateOwnership(context, quizId);
         
-        return await prisma.quiz.delete({where:{id:quizId}});
+    await prisma.quiz.delete({where:{id:quizId}});
+    return { message: "Quiz deleted successfully" };
 
-    }
+    },
+  
     
 },
-
+Quiz: {
+    createdBy: async (parent) => {
+      return await prisma.user.findUnique({
+        where: { id: parent.createdById },
+      });
+    }},
 };
 
 module.exports = quizResolvers

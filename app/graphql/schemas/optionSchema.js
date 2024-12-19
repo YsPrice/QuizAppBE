@@ -1,4 +1,4 @@
-const {gql} = require('apollo-server');
+const { gql } = require('graphql-tag');
 
 const optionSchema = gql`
 type Option{
@@ -10,13 +10,15 @@ question: Question!
 }
 
 extend type Query{
-options:[Option!]!
+options(questionId:ID!):[Option!]!
 option(id:ID!):Option
 }
-
+type Message {
+  message: String!
+}
 extend type Mutation{
 createOption(questionId: ID!, isCorrect: Boolean!,content: String!): Option!
-deleteOption(questionId: ID!, optionId: ID!): Option!
+deleteOption(questionId: ID!, optionId: ID!): Message!
 editOption(questionId: ID!, optionId: ID!, isCorrect: Boolean, content:String): Option!
 }
 `;
