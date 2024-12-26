@@ -27,9 +27,9 @@ model User {
 model Quiz {
   id Int @id @default(autoincrement())
   createdById Int
-  title String
+  title String?
  createdBy User @relation(fields: [createdById], references:[id],onDelete: Cascade)
-  difficulty Difficulty
+  difficulty Difficulty?
    status      QuizStatus @default(DRAFT)
   createdAt DateTime @default(now())
   questions Question[]

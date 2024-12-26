@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Quiz" ALTER COLUMN "difficulty" DROP NOT NULL,
+ALTER COLUMN "title" DROP NOT NULL;

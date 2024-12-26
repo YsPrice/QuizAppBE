@@ -24,7 +24,7 @@ question: async (parent,_) =>{
       if (!question) throw new Error('Question not found!');
       const quiz = await prisma.quiz.findUnique({ where: { id: question.quizId } });
       if (!quiz) throw new Error('Quiz not found!');
-      if (quiz.createdById !== context.userId) throw new Error('Not authorized to add options to this question!');
+      if (quiz.createdById !== context.userId) throw new Error('Not Authenticated');
       return await prisma.option.create({
         data: {
           content,

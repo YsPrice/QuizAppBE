@@ -29,10 +29,12 @@ describe('Quiz Resolvers', () => {
       expect(prismaMock.quiz.create).toHaveBeenCalledWith({
         data: {
           title: 'Math Quiz',
-          difficulty: 'EASY',
+          difficulty: null, // Default for "DRAFT"
+          status: 'DRAFT',
           createdById: 1,
         },
       });
+      
     });
 
     test('Unauthenticated user cannot create a quiz', async () => {
@@ -88,7 +90,7 @@ describe('Quiz Resolvers', () => {
           { id: 1, title: 'Science Quiz', difficulty: 'HARD' },
           { userId: null } 
         )
-      ).rejects.toThrow('Not Authorized to edit this quiz');
+      ).rejects.toThrow('Not Authorized!');
     });
   
     test('Error when editing a quiz that does not exist', async () => {

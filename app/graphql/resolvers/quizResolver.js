@@ -18,41 +18,39 @@ const quizResolvers = {
             return await prisma.quiz.findUnique({where: {id: quizId}})
         },
         quizzesByStatus: async (_, { status }, context) => {
-            if (!context.userId) throw new Error("Not Authorized!");
-        
+            if (!context.userId) throw new Error("Authentication Required!");
+          
             return await prisma.quiz.findMany({
-                where: {
-                    status,
-                    createdById: context.userId,
-                },
+              where: { status },
             });
-        },
+          },
     },
 Mutation: {
-    createQuiz: async (_, {title, difficulty, status="DRAFT"}, context) => {
-        if(!context.userId) throw new Error('Authentication Required!');
-        if (status === "PUBLISHED") {
-          
-            if (!title || !difficulty) {
-                throw new Error("Title and difficulty are required to publish a quiz!");
-            }
+    createQuiz: async (_, { title, difficulty, status = "DRAFT" }, context) => {
+        if (!context.userId) throw new Error('Authentication Required!');
+        if (status === "DRAFT" && !title) {
+          title = "Untitled Draft";
         }
-        return await prisma.quiz.create({
-            data:{
-                title: status === "DRAFT" ? title || null : title,
-                difficulty: status === "DRAFT" ? difficulty || null : difficulty,
-                createdById:context.userId
-            },
-
-        });
+        if (status === "PUBLISHED" && (!title || !difficulty)) {
+          throw new Error("Title and difficulty are required to publish a quiz!");
+        }
       
-    },
-    editQuiz: async (_, { id, title, difficulty }, context) => {
+        return await prisma.quiz.create({
+          data: {
+            title,
+            difficulty: status === "DRAFT" ? null : difficulty,
+            status,
+            createdById: context.userId,
+          },
+        });
+      },
+      
+    editQuiz: async (_, { id, title, difficulty,status }, context) => {
         if (!context.userId) throw new Error("Not Authorized!");
     
         const quiz = await prisma.quiz.findUnique({ where: { id } });
         if (!quiz) throw new Error("Quiz not found!");
-        if (quiz.createdById !== context.userId) throw new Error("Not authorized to edit this quiz!");
+        if (quiz.createdById !== context.userId) throw new Error("Not Authenticated!");
     
         if (quiz.status === "PUBLISHED" && (!title || !difficulty)) {
             throw new Error("Published quizzes must have a title and difficulty!");
@@ -61,10 +59,13 @@ Mutation: {
         const updatedData = {};
         if (title !== undefined) updatedData.title = title;
         if (difficulty !== undefined) updatedData.difficulty = difficulty;
+       
     
         return await prisma.quiz.update({
             where: { id },
             data: updatedData,
+            status:quiz.status
+            
         });
     },
     
