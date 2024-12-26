@@ -3,6 +3,7 @@ const quizSchema = gql`
 type Quiz{
 id: ID!
 title: String!
+status: QuizStatus!
 difficulty: String!
 questions:[Question!]!
 createdBy: User!
@@ -21,6 +22,10 @@ extend type Mutation {
   deleteQuiz(id:ID!):Message!
 }
 
+enum QuizStatus {
+  DRAFT
+  PUBLISHED
+}
 `;
 
 

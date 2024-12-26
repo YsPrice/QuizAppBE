@@ -30,6 +30,7 @@ model Quiz {
   title String
  createdBy User @relation(fields: [createdById], references:[id],onDelete: Cascade)
   difficulty Difficulty
+   status      QuizStatus @default(DRAFT)
   createdAt DateTime @default(now())
   questions Question[]
 }
@@ -54,4 +55,9 @@ enum Difficulty {
   EASY
   MEDIUM
   HARD
+}
+
+enum QuizStatus{
+  DRAFT
+  PUBLISHED
 }
