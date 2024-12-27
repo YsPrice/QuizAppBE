@@ -1,6 +1,7 @@
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const express = require('express');
+const cors = require("cors");
 require('dotenv').config();
 
 const userSchema = require('./graphql/schemas/userSchema');
@@ -46,6 +47,13 @@ const server = new ApolloServer({
 
 async function startServer() {
   await server.start();
+  app.use(
+    cors({
+      origin: "http://localhost:5173", 
+      methods: ["GET", "POST"], 
+      credentials: true, 
+    })
+  );
   app.use(
     '/graphql',
     express.json(),
