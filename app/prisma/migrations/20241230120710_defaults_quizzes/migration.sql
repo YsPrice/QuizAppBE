@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Quiz" ALTER COLUMN "quizzesTaken" SET DEFAULT ARRAY[]::INTEGER[],
+ALTER COLUMN "savedQuizzes" SET DEFAULT ARRAY[]::INTEGER[];

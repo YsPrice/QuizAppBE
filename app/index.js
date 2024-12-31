@@ -85,5 +85,6 @@ async function startServer() {
     console.log('Server is running at port 4000/graphql');
   });
 }
-
+require('dotenv').config();
+console.log(process.env.DATABASE_URL);
 startServer();

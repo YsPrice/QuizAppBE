@@ -18,6 +18,7 @@ Mutation:{
             },
             include: {
               quiz: true, 
+              options: true,
             },
             
         })
@@ -25,38 +26,46 @@ Mutation:{
         return question
     },
 
-    deleteQuestion: async (_,{id},context) =>{
-        if(!context.userId) throw new Error("Not authorized!");
-        const questionId = validateId(id,'question');
-        const question = await prisma.question.findUnique({where:{id:questionId}})
-
-        if(!question) throw new Error("Question not found!");
-
-      await validateQuestionOwnership(context,question.quizId);
- await prisma.question.delete({where:{id: questionId}})
-
-    return { message: "Question deleted successfully" };
+    deleteQuestion: async (_, { id }, context) => {
+      if (!context.userId) throw new Error("Not authorized!");
+      const parsedId = parseInt(id, 10); 
+      console.log("Parsed ID:", parsedId); 
+      if (isNaN(parsedId)) throw new Error("Invalid question ID!");
+    
+      const question = await prisma.question.findUnique({
+        where: { id: parsedId },
+      });
+    
+      if (!question) throw new Error("Question not found!");
+    
+      await validateQuestionOwnership(context, question.quizId);
+    
+      const quesDel = await prisma.question.delete({
+        where: { id: parsedId },
+      });
+      console.log("deletedquestion:", quesDel)
+      return { message: "Question deleted successfully" };
     },
-    editQuestion: async (_,{id, content},context) =>{
-        if(!context.userId) throw new Error("Not authorized!");
-        const questionId = validateId(id,'question');
-        const question = await prisma.question.findUnique({where:{id:questionId}})
-
-        if(!question) throw new Error("Question not found!");
-
-      await validateQuestionOwnership(context,question.quizId);
-      const updatedData = {};
-      if (content !== undefined && content.trim() !== "") {
-        updatedData.content = content;
+    
+    editQuestion: async (_, { id, content }) => {
+      try {
+        const parsedId = parseInt(id, 10); 
+        console.log("ID Received:", id);
+        const question = await prisma.question.findUnique({ where: { id:parsedId } });
+        if (!question) {
+          throw new Error(`Question with ID ${id} not found!`);
+        }
+    
+        return await prisma.question.update({
+          where: { id:parsedId },
+          data: { content },
+        });
+      } catch (error) {
+        console.error("Error in editQuestion Resolver:", error);
+        throw new Error(error.message || "Failed to edit question.");
       }
-      
-      if (Object.keys(updatedData).length === 0) {
-        throw new Error("No fields provided to update");
-      }
-      return await prisma.question.update({where:{id: questionId},
-        data:updatedData
-    });
-    }
+    },
+    
 }
 
 };

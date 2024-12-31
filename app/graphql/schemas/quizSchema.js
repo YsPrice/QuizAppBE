@@ -12,14 +12,15 @@ createdBy: User!
 extend type Query{
 quizzes: [Quiz!]!
 quiz(id: ID!): Quiz
-quizzesByStatus:[Quiz!]!
+quizzesByStatus(status: QuizStatus!): [Quiz!]!
+allQuizzes: [Quiz!]!
 }
 type Message {
   message: String!
 }
 extend type Mutation {
-  createQuiz( title: String, status:String,difficulty: String): Quiz!
-  editQuiz(id: ID!, title:String,difficulty:String,status:String):Quiz!
+  createQuiz( title: String, status:QuizStatus!,difficulty: String): Quiz!
+  editQuiz(id: ID!, title:String,difficulty:String,status:QuizStatus!):Quiz!
   deleteQuiz(id:ID!):Message!
 }
 
@@ -27,7 +28,9 @@ enum QuizStatus {
   DRAFT
   PUBLISHED
 }
+  
 `;
+
 
 
 module.exports = quizSchema;

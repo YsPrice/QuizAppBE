@@ -22,17 +22,21 @@ const validateOwnership = async (context,quizIdInt) =>{
     return { quiz };
 }
 
-const validateQuestionOwnership = async (context, questionId) => {
-  const question = await prisma.question.findUnique({ where: { id: questionId } });
-  if (!question) throw new Error('Question not found!');
+const validateQuestionOwnership = async (context, quizId) => {
+  if (!context.userId) throw new Error("Not authorized!");
 
-  const quiz = await prisma.quiz.findUnique({ where: { id: question.quizId } });
-  if (!quiz || quiz.createdById !== context.userId) {
-    throw new Error('Not authorized to edit this quiz!');
+  const quiz = await prisma.quiz.findUnique({
+    where: { id: quizId },
+    select: { createdById: true },
+  });
+
+  if (!quiz) throw new Error("Quiz not found!");
+
+  if (quiz.createdById !== context.userId) {
+    throw new Error("You are not authorized to modify this quiz.");
   }
-
-  return { question, quiz };
 };
+
 const validateOptionOwnership = async (context, optionId) => {
   console.log("Validating ownership for Option ID:", optionId);
 
